@@ -2,16 +2,11 @@ import cv2
 import numpy as np
 from random import choice
 
-# Controls the speed of the tetris pieces
-# 控制方塊落下的速度
-SPEED = 1 
 
-# Make a board
-# 建立遊戲視窗
+
+# Initialize
 board = np.uint8(np.zeros([20, 10, 3]))
-
-# Initialize some variables
-# 變數初始化
+SPEED = 1 
 quit = False
 place = False
 drop = False
@@ -21,7 +16,6 @@ flag = 0
 score = 0
 
 # All the tetris pieces
-# 所有種類的俄羅斯方塊
 next_piece = choice(["O", "I", "S", "Z", "L", "J", "T"])
 
 def get_info(piece):
@@ -51,9 +45,7 @@ def get_info(piece):
 
 
 def display(board, coords, color, next_info, held_info, score, SPEED):
-    # Generates the display
-    # 顯示遊戲畫面?
-
+    # main
     border = np.uint8(127 - np.zeros([20, 1, 3]))
     border_ = np.uint8(127 - np.zeros([1, 34, 3]))
 
@@ -70,8 +62,7 @@ def display(board, coords, color, next_info, held_info, score, SPEED):
     dummy = dummy.repeat(20, 0).repeat(20, 1)
     dummy = cv2.putText(dummy, str(score), (520, 200), cv2.FONT_HERSHEY_DUPLEX, 1, [0, 0, 255], 2)
 
-    # Instructions for the player
-    # 顯示遊戲介紹
+    # side
     dummy = cv2.putText(dummy, "A - move left", (45, 200), cv2.FONT_HERSHEY_DUPLEX, 0.6, [0, 0, 255])
     dummy = cv2.putText(dummy, "D - move right", (45, 225), cv2.FONT_HERSHEY_DUPLEX, 0.6, [0, 0, 255])
     dummy = cv2.putText(dummy, "S - move down", (45, 250), cv2.FONT_HERSHEY_DUPLEX, 0.6, [0, 0, 255])
@@ -87,24 +78,18 @@ def display(board, coords, color, next_info, held_info, score, SPEED):
 
 if __name__ == "__main__":
     while not quit:
-        # Check if user wants to swap held and current pieces
-        # 先確認玩家有要對方塊交換(做動作)
         if switch:
-           # swap held_piece and current_piece
-           # 切換方塊
+           # rotate
             held_piece, current_piece = current_piece, held_piece
             switch = False
         else:
-            # Generates the next piece and updates the current piece
-            # 生成下一個方塊 並 更新現在的方塊
             current_piece = next_piece
             next_piece = choice(["I", "T", "L", "J", "Z", "S", "O"])
         
         if flag > 0:
             flag -= 1
         
-        # Determines the color and position of the current, next, and held pieces
-        # 決定現在的方塊、下一個方塊的位置及顏色
+        # 方塊顏色和位置
         if held_piece == "":
             held_info = np.array([[0, 0]]), [0, 0, 0]
         else:
@@ -120,48 +105,36 @@ if __name__ == "__main__":
             break
             
         while True:
-            # Shows the board and gets the key press
-            # 顯示畫面 及 取得按鍵
             key = display(board, coords, color, next_info, held_info, score, SPEED)
-            # Create a copy of the position
-            # 複製位置
             dummy = coords.copy()
         
             if key == ord("a"):
-                # Moves the piece left if it isn't against the left wall
-                # 若方塊還沒貼左壁，則將方塊左移
+                # 左
                 if np.min(coords[:,1]) > 0:
                     coords[:,1] -= 1
                 if current_piece == "I":
                     top_left[1] -= 1
                     
             elif key == ord("d"):
-                # Moves the piece right if it isn't against the right wall
-                # 若方塊還沒貼右壁，則將方塊右移
+                # 右
                 if np.max(coords[:,1]) < 9:
                     coords[:,1] += 1
                     if current_piece == "I":
                         top_left[1] += 1
                         
             elif key == ord("j") or key == ord("l"):
-                # Rotation mechanism
-                # 旋轉機制
-                # arr is the array of nearby points which get rotated and pov is the indexes of the blocks within arr
-                # arr 是選轉的座標點? pov 是索引 
+                # 旋轉 
                 if current_piece != "I" and current_piece != "O":
                     if coords[1,1] > 0 and coords[1,1] < 9:
                         arr = coords[1] - 1 + np.array([[[x, y] for y in range(3)] for x in range(3)])
                         pov = coords - coords[1] + 1
                     
                 elif current_piece == "I":
-                    # The straight piece has a 4x4 array, so it needs seperate code
-                    # 直條的方塊有4x4陣列 所以需要分開??
                     arr = top_left + np.array([[[x, y] for y in range(4)] for x in range(4)])
                     pov = np.array([np.where(np.logical_and(arr[:,:,0] == pos[0], arr[:,:,1] == pos[1])) for pos in coords])
                     pov = np.array([k[0] for k in np.swapaxes(pov, 1, 2)])
             
-                # Rotates the array and repositions the piece to where it is now
-                # 選轉陣列 並 重定位
+
                 if current_piece != "O":
                     if key == ord("j"):
                         arr = np.rot90(arr, -1)
