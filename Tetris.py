@@ -4,6 +4,19 @@ import random
 
 class Tetris:
     def __init__(self):
+        self.WINDOW_NAME = "Tetris"
+        self.RATIO = 20
+        self.CENTER_POINT_X = 340
+        self.CENTER_POINT_Y = 220
+        self.COLOR = {
+            "black" : [0, 0, 0],
+            "white" : [255, 255, 255],
+            "blue" : [255, 41, 41],
+            "red" : [179, 179, 255],
+            "yellow" : [153, 238, 255],
+            "green" : [217, 217, 180],
+            "purple" : [255, 179, 219],
+        }
         self.BOARD = np.uint8(np.zeros([20, 10, 3]))
         self.COMMANDS = {
             "rotate" : [ord("w"), ord("W")],
@@ -55,55 +68,72 @@ class Tetris:
 
     def areMatched(self, key, command):
         return key in self.COMMANDS[command]
-    
-    def endGame(self):
-        print(self.score)
-    
-    def eliminate(self):
-        lines = 0
-        for line in range(20):
-            if np.all([np.any(pos != 0) for pos in self.BOARD[line]]):
-                lines += 1
-                self.BOARD[1:line+1] = self.BOARD[:line]
-        if lines == 0 :
-            return
 
-        if lines == 1:
-            self.score += 40
-        elif lines == 2:
-            self.score += 100
-        elif lines == 3:
-            self.score += 300
-        elif lines == 4:
-            self.score += 1200
+    def startGame(self):
+        homePage = np.zeros((440, 680, 3), np.uint8)
+        font = cv2.FONT_HERSHEY_DUPLEX
+        cv2.putText(homePage, "TETRIS", (self.CENTER_POINT_X-150, self.CENTER_POINT_Y-130), font, 3, self.COLOR["white"], 10)
 
-    def display(self, coords, color, nextPiece, heldPiece):
-        # game
-        dummy = self.BOARD.copy()
-        dummy[coords[:,0], coords[:,1]] = color
+        homePage[self.CENTER_POINT_Y-100:self.CENTER_POINT_Y-40, self.CENTER_POINT_X-100:self.CENTER_POINT_X+100] = self.COLOR["red"]
+        cv2.putText(homePage, "START", (self.CENTER_POINT_X-70, self.CENTER_POINT_Y-55), font, 1.5, self.COLOR["black"], 2)
 
-        right = np.uint8(np.zeros([20, 10, 3]))
-        right[nextPiece[0][:,0] + 2, nextPiece[0][:,1]] = nextPiece[1]
-        left = np.uint8(np.zeros([20, 10, 3]))
-        left[heldPiece[0][:,0] + 2, heldPiece[0][:,1]] = heldPiece[1]
+        homePage[self.CENTER_POINT_Y-20:self.CENTER_POINT_Y+40, self.CENTER_POINT_X-100:self.CENTER_POINT_X+100] = self.COLOR["purple"]
+        cv2.putText(homePage, "LEVEL", (self.CENTER_POINT_X-68, self.CENTER_POINT_Y+25), font, 1.5, self.COLOR["black"], 2)
 
-        dummy = np.concatenate((self.border, left, self.border, dummy, self.border, right, self.border), 1)
-        dummy = np.concatenate((self.border_, dummy, self.border_), 0)
-        dummy = dummy.repeat(20, 0).repeat(20, 1)
-        dummy = cv2.putText(dummy, str(self.score), (520, 200), cv2.FONT_HERSHEY_DUPLEX, 1, [0, 0, 255], 2)
+        homePage[self.CENTER_POINT_Y+60:self.CENTER_POINT_Y+120, self.CENTER_POINT_X-100:self.CENTER_POINT_X+100] = self.COLOR["green"]
+        cv2.putText(homePage, "RANK", (self.CENTER_POINT_X-62, self.CENTER_POINT_Y+105), font, 1.5, self.COLOR["black"], 2)
 
-        # side
-        dummy = cv2.putText(dummy, "A - move left", (45, 200), cv2.FONT_HERSHEY_DUPLEX, 0.6, [0, 0, 255])
-        dummy = cv2.putText(dummy, "D - move right", (45, 225), cv2.FONT_HERSHEY_DUPLEX, 0.6, [0, 0, 255])
-        dummy = cv2.putText(dummy, "S - move down", (45, 250), cv2.FONT_HERSHEY_DUPLEX, 0.6, [0, 0, 255])
-        dummy = cv2.putText(dummy, "Space - hard drop", (45, 275), cv2.FONT_HERSHEY_DUPLEX, 0.6, [0, 0, 255])
-        dummy = cv2.putText(dummy, "W - rotate", (45, 300), cv2.FONT_HERSHEY_DUPLEX, 0.6, [0, 0, 255])
-        dummy = cv2.putText(dummy, "Q - hold", (45, 350), cv2.FONT_HERSHEY_DUPLEX, 0.6, [0, 0, 255])
+        homePage[self.CENTER_POINT_Y+140:self.CENTER_POINT_Y+200, self.CENTER_POINT_X-100:self.CENTER_POINT_X+100] = self.COLOR["yellow"]
+        cv2.putText(homePage, "RULE", (self.CENTER_POINT_X-62, self.CENTER_POINT_Y+185), font, 1.5, self.COLOR["black"], 2)
 
-        cv2.imshow("Tetris", dummy)
-        return cv2.waitKey(int(1000/self.speed))
+        cv2.imshow(self.WINDOW_NAME, homePage)
+        cv2.waitKey()
 
-    def play(self):
+    def playGame(self):
+        def display(coords, color, nextPiece, heldPiece):
+            # game
+            dummy = self.BOARD.copy()
+            dummy[coords[:,0], coords[:,1]] = color
+
+            right = np.uint8(np.zeros([20, 10, 3]))
+            right[nextPiece[0][:,0] + 2, nextPiece[0][:,1]] = nextPiece[1]
+            left = np.uint8(np.zeros([20, 10, 3]))
+            left[heldPiece[0][:,0] + 2, heldPiece[0][:,1]] = heldPiece[1]
+
+            dummy = np.concatenate((self.border, left, self.border, dummy, self.border, right, self.border), 1)
+            dummy = np.concatenate((self.border_, dummy, self.border_), 0)
+            dummy = dummy.repeat(self.RATIO, 0).repeat(self.RATIO, 1)
+            dummy = cv2.putText(dummy, str(self.score), (520, 200), cv2.FONT_HERSHEY_DUPLEX, 1, [0, 0, 255], 2)
+
+            # side
+            dummy = cv2.putText(dummy, "A - move left", (45, 200), cv2.FONT_HERSHEY_DUPLEX, 0.6, [0, 0, 255])
+            dummy = cv2.putText(dummy, "D - move right", (45, 225), cv2.FONT_HERSHEY_DUPLEX, 0.6, [0, 0, 255])
+            dummy = cv2.putText(dummy, "S - move down", (45, 250), cv2.FONT_HERSHEY_DUPLEX, 0.6, [0, 0, 255])
+            dummy = cv2.putText(dummy, "Space - hard drop", (45, 275), cv2.FONT_HERSHEY_DUPLEX, 0.6, [0, 0, 255])
+            dummy = cv2.putText(dummy, "W - rotate", (45, 300), cv2.FONT_HERSHEY_DUPLEX, 0.6, [0, 0, 255])
+            dummy = cv2.putText(dummy, "Q - hold", (45, 350), cv2.FONT_HERSHEY_DUPLEX, 0.6, [0, 0, 255])
+
+            cv2.imshow(self.WINDOW_NAME, dummy)
+            return cv2.waitKey(int(1000/self.speed))
+
+        def eliminate():
+            lines = 0
+            for line in range(20):
+                if np.all([np.any(pos != 0) for pos in self.BOARD[line]]):
+                    lines += 1
+                    self.BOARD[1:line+1] = self.BOARD[:line]
+            if lines == 0 :
+                return
+
+            if lines == 1:
+                self.score += 40
+            elif lines == 2:
+                self.score += 100
+            elif lines == 3:
+                self.score += 300
+            elif lines == 4:
+                self.score += 1200
+
         isGaming = True
         isPlaced = False
         isHardDrop = False
@@ -135,7 +165,7 @@ class Tetris:
                 break
                 
             while True:
-                key = self.display(coords, color, nextPiece, heldPiece)
+                key = display(coords, color, nextPiece, heldPiece)
                 dummy = coords.copy()
 
                 if self.areMatched(key, "left"):
@@ -224,6 +254,12 @@ class Tetris:
                     topLeft[0] += 1
             
             # 消除和得分
-            self.eliminate()
-        
+            eliminate()
+
+    def endGame(self):
+        print(self.score)
+    
+    def play(self):
+        self.startGame()
+        self.playGame()
         self.endGame()
