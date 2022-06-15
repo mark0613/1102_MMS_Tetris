@@ -108,32 +108,27 @@ if __name__ == "__main__":
             key = display(board, coords, color, next_info, held_info, score, SPEED)
             dummy = coords.copy()
         
-            if key == ord("a"):
-                # 左
+            if key == ord("a"):  # 往左
                 if np.min(coords[:,1]) > 0:
                     coords[:,1] -= 1
                 if current_piece == "I":
                     top_left[1] -= 1
                     
-            elif key == ord("d"):
-                # 右
+            elif key == ord("d"):  # 往右
                 if np.max(coords[:,1]) < 9:
                     coords[:,1] += 1
                     if current_piece == "I":
                         top_left[1] += 1
                         
-            elif key == ord("j") or key == ord("l"):
-                # 旋轉 
+            elif key == ord("j") or key == ord("l"):  # 旋轉 
                 if current_piece != "I" and current_piece != "O":
                     if coords[1,1] > 0 and coords[1,1] < 9:
                         arr = coords[1] - 1 + np.array([[[x, y] for y in range(3)] for x in range(3)])
                         pov = coords - coords[1] + 1
-                    
                 elif current_piece == "I":
                     arr = top_left + np.array([[[x, y] for y in range(4)] for x in range(4)])
                     pov = np.array([np.where(np.logical_and(arr[:,:,0] == pos[0], arr[:,:,1] == pos[1])) for pos in coords])
                     pov = np.array([k[0] for k in np.swapaxes(pov, 1, 2)])
-            
 
                 if current_piece != "O":
                     if key == ord("j"):
@@ -142,13 +137,10 @@ if __name__ == "__main__":
                         arr = np.rot90(arr)
                     coords = arr[pov[:,0], pov[:,1]]
             
-            elif key == ord("w"):
-                # Hard drop set to true
-                # 將 方塊直接落下 設成true
+            elif key == ord("w"):  # 直接墜落
                 drop = True
-            elif key == ord("i"):
-                # Goes out of the loop and tells the program to switch held and current pieces
-                # 跳出迴圈 並 切換當前的方塊
+
+            elif key == ord("i"):  # 存方塊
                 if flag == 0:
                     if held_piece == "":
                         held_piece = current_piece
@@ -156,7 +148,8 @@ if __name__ == "__main__":
                         switch = True
                     flag = 2
                     break
-            elif key == 8 or key == 27:
+
+            elif key == 8 or key == 27:  # 結束遊戲
                 quit = True
                 break
                 
@@ -172,26 +165,22 @@ if __name__ == "__main__":
                 coords = dummy.copy()
                 
             if drop:
-                # Every iteration of the loop moves the piece down by 1 and if the piece is resting on the ground or another piece, then it stops and places it
-                # 每個迴圈都會將方塊下降一格，直到 "到底 或者 "碰到其他方塊"，則放置
+                # 下降
                 while not place:
+                    # 放置方塊
                     if np.max(coords[:,0]) != 19:
-                        # Checks if the piece is resting on something
-                        # 確認方塊靠在某東西上，放置
+                        # 放在其他方塊上
                         for pos in coords:
                             if not np.array_equal(board[pos[0] + 1, pos[1]], [0, 0, 0]):
                                 place = True
                                 break
                     else:
-                        # If the position of the piece is at the ground level, then it places
-                        # 若方塊落到地面，放置
+                        # 放在地上
                         place = True
                     
                     if place:
                         break
-                    
-                    # Keeps going down and checking when the piece needs to be placed
-                    # 繼續下降直到方塊需要被放置
+
                     coords[:,0] += 1
                     score += 1
                     if current_piece == "I":
@@ -221,25 +210,19 @@ if __name__ == "__main__":
                 place = False
                 break
 
-            # Moves down by 1
             # 下降一格
-
             coords[:,0] += 1
             if key == ord("s"):
                 score += 1
             if current_piece == "I":
                 top_left[0] += 1
         
-        # Clears lines and also counts how many lines have been cleared and updates the score
-        # 清除滿格的那列 並 更新分數
-                
+        # 消除和得分
         lines = 0
-                
         for line in range(20):
             if np.all([np.any(pos != 0) for pos in board[line]]):
                 lines += 1
                 board[1:line+1] = board[:line]
-                        
         if lines == 1:
             score += 40
         elif lines == 2:
