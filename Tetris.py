@@ -1,6 +1,9 @@
+from tools import *
+
 import cv2
 import numpy as np
 import random
+import time
 
 class Tetris:
     def __init__(self):
@@ -36,7 +39,21 @@ class Tetris:
         self.score = 0
     
     def loadConfiguration(self):
-        self.speed = 1
+        config = {
+            "speed" : 1,
+        }
+        result = loadJsonFile("config.json")
+        config = result if result else config
+        self.speed = config["speed"]
+    
+    def loadRecord(self):
+        record = []
+        result = loadJsonFile("record.json")
+        record = result if result else record
+        return record
+    
+    def saveRecord(self, record):
+        dumpJsonFile(record, "record.json")
 
     def getRandomPieceCode(self):
         return random.choice(self.ALL_PIECES)
@@ -257,8 +274,19 @@ class Tetris:
             eliminate()
 
     def endGame(self):
-        print(self.score)
-    
+        timestamp = time.strftime("%Y/%m/%d, %H:%M:%S", time.localtime())
+        record = self.loadRecord()
+        newRecord = {
+            "time" : timestamp,
+            "score" : self.score,
+        }
+        record.append(newRecord)
+        record.sort(key=lambda r: r["score"], reverse=True)
+        self.saveRecord(record)
+        for idx, r in enumerate(record):
+            if r["time"] == timestamp:
+                print(f"Rank: {idx+1}")
+
     def play(self):
         self.startGame()
         self.playGame()
