@@ -1,6 +1,6 @@
 import cv2
 import numpy as np
-from random import choice
+import random
 
 
 
@@ -16,7 +16,7 @@ flag = 0
 score = 0
 
 # All the tetris pieces
-next_piece = choice(["O", "I", "S", "Z", "L", "J", "T"])
+next_piece = random.choice(["O", "I", "S", "Z", "L", "J", "T"])
 
 def get_info(piece):
     if piece == "I":
@@ -78,13 +78,12 @@ def display(board, coords, color, next_info, held_info, score, SPEED):
 
 if __name__ == "__main__":
     while not quit:
-        if switch:
-           # rotate
+        if switch: # rotate
             held_piece, current_piece = current_piece, held_piece
             switch = False
         else:
             current_piece = next_piece
-            next_piece = choice(["I", "T", "L", "J", "Z", "S", "O"])
+            next_piece = random.choice(["I", "T", "L", "J", "Z", "S", "O"])
         
         if flag > 0:
             flag -= 1
@@ -200,13 +199,9 @@ if __name__ == "__main__":
                     place = True
                 
             if place:
-                # Places the piece where it is on the board
                 # 放置方塊
                 for pos in coords:
                     board[tuple(pos)] = color
-                    
-                # Resets place to False
-                # 將判斷是否為需要放置的變數改回false
                 place = False
                 break
 
