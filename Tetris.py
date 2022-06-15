@@ -41,10 +41,16 @@ class Tetris:
     def loadConfiguration(self):
         config = {
             "speed" : 1,
+            "isZen" : False
         }
         result = loadJsonFile("config.json")
         config = result if result else config
         self.speed = config["speed"]
+        self.isZen = config["isZen"]
+        self.timer = 120
+    
+    def saveConfiguration(self, data):
+        pass
     
     def loadRecord(self):
         record = []
@@ -138,12 +144,8 @@ class Tetris:
             dummy = cv2.putText(dummy, str(self.score), (520, 200), cv2.FONT_HERSHEY_DUPLEX, 1, [0, 0, 255], 2)
 
             # side
-            dummy = cv2.putText(dummy, "A - move left", (45, 200), cv2.FONT_HERSHEY_DUPLEX, 0.6, [0, 0, 255])
-            dummy = cv2.putText(dummy, "D - move right", (45, 225), cv2.FONT_HERSHEY_DUPLEX, 0.6, [0, 0, 255])
-            dummy = cv2.putText(dummy, "S - move down", (45, 250), cv2.FONT_HERSHEY_DUPLEX, 0.6, [0, 0, 255])
-            dummy = cv2.putText(dummy, "Space - hard drop", (45, 275), cv2.FONT_HERSHEY_DUPLEX, 0.6, [0, 0, 255])
-            dummy = cv2.putText(dummy, "W - rotate", (45, 300), cv2.FONT_HERSHEY_DUPLEX, 0.6, [0, 0, 255])
-            dummy = cv2.putText(dummy, "Q - hold", (45, 350), cv2.FONT_HERSHEY_DUPLEX, 0.6, [0, 0, 255])
+            timerText = "oo" if self.isZen else timer-1
+            dummy = cv2.putText(dummy, f"time: {timerText}", (45, 200), cv2.FONT_HERSHEY_DUPLEX, 0.6, self.COLOR["white"])
 
             cv2.imshow(self.WINDOW_NAME, dummy)
             return cv2.waitKey(int(1000/self.speed))
@@ -172,8 +174,17 @@ class Tetris:
         switch = False
         heldPieceCode = ""
         nextPieceCode = self.getRandomPieceCode()
+        timer = self.timer
+        startTimeStamp = time.time()
+
+        executingTimeStamp1 = startTimeStamp
 
         while isGaming:
+            executingTimeStamp2 = time.time()
+            if not self.isZen:
+                if executingTimeStamp2 - startTimeStamp >= self.timer:
+                    break
+            
             if switch: # 交換
                 heldPieceCode, currentPieceCode = currentPieceCode, heldPieceCode
                 switch = False
@@ -195,6 +206,15 @@ class Tetris:
                 break
                 
             while True:
+                # timer
+                executingTimeStamp2 = time.time()
+                if not self.isZen:
+                    if executingTimeStamp2 - startTimeStamp >= self.timer:
+                        break
+                if executingTimeStamp2 - executingTimeStamp1 >= 1:
+                    timer -= 1
+                    executingTimeStamp1 = executingTimeStamp2
+
                 key = display(coords, color, nextPiece, heldPiece)
                 dummy = coords.copy()
 
