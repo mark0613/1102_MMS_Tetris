@@ -184,7 +184,6 @@ if __name__ == "__main__":
                     if isPlaced:
                         break
                     coords[:,0] += 1
-                    score += 1
                     if currentPieceCode == "I":
                         topLeft[0] += 1
                         
@@ -209,8 +208,6 @@ if __name__ == "__main__":
 
             # 下降一格
             coords[:,0] += 1
-            if areMatched(key, "down"):
-                score += 1
             if currentPieceCode == "I":
                 topLeft[0] += 1
         
