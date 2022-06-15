@@ -6,6 +6,18 @@ import random
 
 
 # Initialize
+WINDOW_NAME = "Tetris"
+CENTER_POINT_X = 340
+CENTER_POINT_Y = 220
+COLOR = {
+    "black" : [0, 0, 0],
+    "white" : [255, 255, 255],
+    "blue" : [255, 41, 41],
+    "red" : [179, 179, 255],
+    "yellow" : [153, 238, 255],
+    "green" : [217, 217, 180],
+    "purple" : [255, 179, 219],
+}
 BOARD = np.uint8(np.zeros([20, 10, 3]))
 SPEED = 1 
 COMMANDS = {
@@ -85,8 +97,29 @@ def display(BOARD, coords, color, nextPiece, heldPiece, score, SPEED):
     cv2.imshow("Tetris", dummy)
 
     return cv2.waitKey(int(1000/SPEED))
+def start():
+    homePage = np.zeros((440, 680, 3), np.uint8)
+    font = cv2.FONT_HERSHEY_DUPLEX
+    cv2.putText(homePage, "TETRIS", (CENTER_POINT_X-150, CENTER_POINT_Y-130), font, 3, COLOR["white"], 10)
+
+    homePage[CENTER_POINT_Y-100:CENTER_POINT_Y-40, CENTER_POINT_X-100:CENTER_POINT_X+100] = COLOR["red"]
+    cv2.putText(homePage, "START", (CENTER_POINT_X-70, CENTER_POINT_Y-55), font, 1.5, COLOR["black"], 2)
+
+    homePage[CENTER_POINT_Y-20:CENTER_POINT_Y+40, CENTER_POINT_X-100:CENTER_POINT_X+100] = COLOR["purple"]
+    cv2.putText(homePage, "LEVEL", (CENTER_POINT_X-68, CENTER_POINT_Y+25), font, 1.5, COLOR["black"], 2)
+
+    homePage[CENTER_POINT_Y+60:CENTER_POINT_Y+120, CENTER_POINT_X-100:CENTER_POINT_X+100] = COLOR["green"]
+    cv2.putText(homePage, "RANK", (CENTER_POINT_X-62, CENTER_POINT_Y+105), font, 1.5, COLOR["black"], 2)
+
+    homePage[CENTER_POINT_Y+140:CENTER_POINT_Y+200, CENTER_POINT_X-100:CENTER_POINT_X+100] = COLOR["yellow"]
+    cv2.putText(homePage, "RULE", (CENTER_POINT_X-62, CENTER_POINT_Y+185), font, 1.5, COLOR["black"], 2)
+
+    cv2.imshow(WINDOW_NAME, homePage)
+    cv2.waitKey()
+    cv2.destroyAllWindows
 
 if __name__ == "__main__":
+    start()
     while isGaming:
         if switch: # 交換
             heldPieceCode, currentPieceCode = currentPieceCode, heldPieceCode
