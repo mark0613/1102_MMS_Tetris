@@ -3,8 +3,6 @@ import numpy as np
 import random
 
 
-
-# Initialize
 BOARD = np.uint8(np.zeros([20, 10, 3]))
 SPEED = 1 
 COMMANDS = {
@@ -82,8 +80,10 @@ def display(BOARD, coords, color, nextPiece, heldPiece, score, SPEED):
     dummy = cv2.putText(dummy, "Q - hold", (45, 350), cv2.FONT_HERSHEY_DUPLEX, 0.6, [0, 0, 255])
 
     cv2.imshow("Tetris", dummy)
-
     return cv2.waitKey(int(1000/SPEED))
+
+def endGame():
+    print(score)
 
 if __name__ == "__main__":
     while isGaming:
@@ -217,3 +217,5 @@ if __name__ == "__main__":
             score += 300
         elif lines == 4:
             score += 1200
+    
+    endGame()
