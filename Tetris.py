@@ -165,20 +165,18 @@ class Tetris:
             else:
                 currentPieceCode = nextPieceCode
                 nextPieceCode = self.getRandomPieceCode()
-            
-            # 方塊顏色和位置
+
             if heldPieceCode == "":
                 heldPiece = np.array([[0, 0]]), [0, 0, 0]
             else:
                 heldPiece = self.getPieceInfo(heldPieceCode)
-            
             nextPiece = self.getPieceInfo(nextPieceCode)
-
             coords, color = self.getPieceInfo(currentPieceCode)
+
             if currentPieceCode == "I":
                 topLeft = [-2, 3]
                 
-            if not np.all(self.BOARD[coords[:,0], coords[:,1]] == 0):
+            if np.any(self.BOARD[coords[:,0], coords[:,1]] != 0):
                 break
                 
             while True:
@@ -189,7 +187,7 @@ class Tetris:
                     if np.min(coords[:,1]) > 0:
                         coords[:,1] -= 1
                     if currentPieceCode == "I":
-                        topLeft[1] -= 1
+                        topLeft[1] = 0 if topLeft[1]<1 else topLeft[1]-1
                         
                 elif self.areMatched(key, "right"):
                     if np.max(coords[:,1]) < 9:
