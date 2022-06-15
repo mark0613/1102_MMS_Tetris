@@ -66,10 +66,9 @@ def display(board, coords, color, next_info, held_info, score, SPEED):
     dummy = cv2.putText(dummy, "A - move left", (45, 200), cv2.FONT_HERSHEY_DUPLEX, 0.6, [0, 0, 255])
     dummy = cv2.putText(dummy, "D - move right", (45, 225), cv2.FONT_HERSHEY_DUPLEX, 0.6, [0, 0, 255])
     dummy = cv2.putText(dummy, "S - move down", (45, 250), cv2.FONT_HERSHEY_DUPLEX, 0.6, [0, 0, 255])
-    dummy = cv2.putText(dummy, "W - hard drop", (45, 275), cv2.FONT_HERSHEY_DUPLEX, 0.6, [0, 0, 255])
-    dummy = cv2.putText(dummy, "J - rotate left", (45, 300), cv2.FONT_HERSHEY_DUPLEX, 0.6, [0, 0, 255])
-    dummy = cv2.putText(dummy, "L - rotate right", (45, 325), cv2.FONT_HERSHEY_DUPLEX, 0.6, [0, 0, 255])
-    dummy = cv2.putText(dummy, "I - hold", (45, 350), cv2.FONT_HERSHEY_DUPLEX, 0.6, [0, 0, 255])
+    dummy = cv2.putText(dummy, "Space - hard drop", (45, 275), cv2.FONT_HERSHEY_DUPLEX, 0.6, [0, 0, 255])
+    dummy = cv2.putText(dummy, "w - rotate", (45, 300), cv2.FONT_HERSHEY_DUPLEX, 0.6, [0, 0, 255])
+    dummy = cv2.putText(dummy, "q - hold", (45, 350), cv2.FONT_HERSHEY_DUPLEX, 0.6, [0, 0, 255])
 
     cv2.imshow("Tetris", dummy)
     key = cv2.waitKey(int(1000/SPEED))
@@ -121,8 +120,8 @@ if __name__ == "__main__":
                     coords[:,1] += 1
                     if current_piece == "I":
                         top_left[1] += 1
-                        
-            elif key == ord("j") or key == ord("l"):
+
+            elif key == ord("w"):
                 # 旋轉 
                 if current_piece != "I" and current_piece != "O":
                     if coords[1,1] > 0 and coords[1,1] < 9:
@@ -134,19 +133,14 @@ if __name__ == "__main__":
                     pov = np.array([np.where(np.logical_and(arr[:,:,0] == pos[0], arr[:,:,1] == pos[1])) for pos in coords])
                     pov = np.array([k[0] for k in np.swapaxes(pov, 1, 2)])
             
-
                 if current_piece != "O":
-                    if key == ord("j"):
-                        arr = np.rot90(arr, -1)
-                    else:
-                        arr = np.rot90(arr)
+                    arr = np.rot90(arr, -1)
                     coords = arr[pov[:,0], pov[:,1]]
             
-            elif key == ord("w"):
-                # Hard drop set to true
-                # 將 方塊直接落下 設成true
+            elif key == 32:
                 drop = True
-            elif key == ord("i"):
+
+            elif key == ord("q"):
                 # Goes out of the loop and tells the program to switch held and current pieces
                 # 跳出迴圈 並 切換當前的方塊
                 if flag == 0:
@@ -156,7 +150,7 @@ if __name__ == "__main__":
                         switch = True
                     flag = 2
                     break
-            elif key == 8 or key == 27:
+            elif key == 27:
                 quit = True
                 break
                 
