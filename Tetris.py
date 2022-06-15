@@ -86,6 +86,21 @@ class Tetris:
     def areMatched(self, key, command):
         return key in self.COMMANDS[command]
 
+    def chooseLevel(self):
+        levelPage = cv2.imread("level.png")
+        cv2.imshow(self.WINDOW_NAME, levelPage)
+        cv2.waitKey()
+
+    def showRank(self):
+        rankPage = cv2.imread("rank-begin.png")
+        cv2.imshow(self.WINDOW_NAME, rankPage)
+        cv2.waitKey()
+
+    def showRule(self):
+        rulePage = cv2.imread("rule.png")
+        cv2.imshow(self.WINDOW_NAME, rulePage)
+        cv2.waitKey()
+
     def startGame(self):
         homePage = np.zeros((440, 680, 3), np.uint8)
         font = cv2.FONT_HERSHEY_DUPLEX
@@ -101,7 +116,7 @@ class Tetris:
         cv2.putText(homePage, "RANK", (self.CENTER_POINT_X-62, self.CENTER_POINT_Y+105), font, 1.5, self.COLOR["black"], 2)
 
         homePage[self.CENTER_POINT_Y+140:self.CENTER_POINT_Y+200, self.CENTER_POINT_X-100:self.CENTER_POINT_X+100] = self.COLOR["yellow"]
-        cv2.putText(homePage, "RULE", (self.CENTER_POINT_X-62, self.CENTER_POINT_Y+185), font, 1.5, self.COLOR["black"], 2)
+        cv2.putText(homePage, "RULES", (self.CENTER_POINT_X-70, self.CENTER_POINT_Y+185), font, 1.5, self.COLOR["black"], 2)
 
         cv2.imshow(self.WINDOW_NAME, homePage)
         cv2.waitKey()
@@ -289,6 +304,9 @@ class Tetris:
 
     def play(self):
         self.startGame()
+        self.showRule()
+        self.showRank()
+        self.chooseLevel()
         self.playGame()
         self.endGame()
 
