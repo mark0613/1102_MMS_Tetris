@@ -291,3 +291,6 @@ class Tetris:
         self.startGame()
         self.playGame()
         self.endGame()
+
+if __name__ == "__main__":
+    Tetris().play()
