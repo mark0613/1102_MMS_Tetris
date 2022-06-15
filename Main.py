@@ -16,6 +16,7 @@ COMMANDS = {
     "hold" : [ord("q"), ord("Q")],
     "quit" : [27]
 }
+ALL_PIECES = ["O", "I", "S", "Z", "L", "J", "T"]
 isGaming = True
 isPlaced = False
 isHardDrop = False
@@ -23,9 +24,7 @@ switch = False
 heldPieceCode = ""
 flag = 0
 score = 0
-
-# All the tetris pieces
-nextPieceCode = random.choice(["O", "I", "S", "Z", "L", "J", "T"])
+nextPieceCode = random.choice(ALL_PIECES)
 
 def areMatched(key, command):
     return key in COMMANDS[command]
@@ -83,9 +82,8 @@ def display(BOARD, coords, color, nextPiece, heldPiece, score, SPEED):
     dummy = cv2.putText(dummy, "Q - hold", (45, 350), cv2.FONT_HERSHEY_DUPLEX, 0.6, [0, 0, 255])
 
     cv2.imshow("Tetris", dummy)
-    key = cv2.waitKey(int(1000/SPEED))
 
-    return key
+    return cv2.waitKey(int(1000/SPEED))
 
 if __name__ == "__main__":
     while isGaming:
@@ -117,7 +115,7 @@ if __name__ == "__main__":
         while True:
             key = display(BOARD, coords, color, nextPiece, heldPiece, score, SPEED)
             dummy = coords.copy()
-        
+
             if areMatched(key, "left"):
                 if np.min(coords[:,1]) > 0:
                     coords[:,1] -= 1
@@ -160,19 +158,18 @@ if __name__ == "__main__":
                 isGaming = False
                 break
                 
-            # Checks if the piece is overlapping with other pieces or if it's outside the board, and if so, changes the position to the position before anything happened
-            # 檢查方塊 "是否重疊" 或者 "超出格子"，若是，則在發生任何事情之前先改變位置
+            # 處理方塊重疊或超線
             if np.max(coords[:,0]) < 20 and np.min(coords[:,0]) >= 0:
-                if not (currentPieceCode == "I" and (np.max(coords[:,1]) >= 10 or np.min(coords[:,1]) < 0)):
-                    if not np.all(BOARD[coords[:,0], coords[:,1]] == 0):
-                        coords = dummy.copy()
-                else:
+                if currentPieceCode == "I" and (np.max(coords[:,1]) >= 10 or np.min(coords[:,1]) < 0):
                     coords = dummy.copy()
+                else:
+                    if np.any(BOARD[coords[:,0], coords[:,1]] != 0):
+                        coords = dummy.copy()
             else:
                 coords = dummy.copy()
                 
-            if isHardDrop:  # 下降
-                while not isPlaced:  # 放置方塊
+            if isHardDrop:
+                while not isPlaced:
                     if np.max(coords[:,0]) != 19:  # 放在其他方塊上
                         for pos in coords:
                             if not np.array_equal(BOARD[pos[0] + 1, pos[1]], [0, 0, 0]):
@@ -180,19 +177,14 @@ if __name__ == "__main__":
                                 break
                     else:  # 放在地上
                         isPlaced = True
-                    
                     if isPlaced:
                         break
                     coords[:,0] += 1
                     if currentPieceCode == "I":
-                        topLeft[0] += 1
-                        
+                        topLeft[0] += 1  
                 isHardDrop = False
-            
             else:
-                # Checks if the piece needs to be placed
-                # 確認方塊是否需要被放置
-                if np.max(coords[:,0]) != 19:
+                if np.max(coords[:,0]) != 19:  # 確認方塊是否需要被放置
                     for pos in coords:
                         if not np.array_equal(BOARD[pos[0] + 1, pos[1]], [0, 0, 0]):
                             isPlaced = True
@@ -200,7 +192,7 @@ if __name__ == "__main__":
                 else:
                     isPlaced = True
                 
-            if isPlaced:  # 放置方塊
+            if isPlaced:
                 for pos in coords:
                     BOARD[tuple(pos)] = color
                 isPlaced = False
