@@ -30,7 +30,7 @@ nextPieceCode = random.choice(["O", "I", "S", "Z", "L", "J", "T"])
 def areMatched(key, command):
     return key in COMMANDS[command]
 
-def getPiecePiece(pieceCode):
+def getPieceInfo(pieceCode):
     if pieceCode == "I":
         coords = np.array([[0, 3], [0, 4], [0, 5], [0, 6]])
         color = [255, 155, 15]
@@ -103,11 +103,11 @@ if __name__ == "__main__":
         if heldPieceCode == "":
             heldPiece = np.array([[0, 0]]), [0, 0, 0]
         else:
-           heldPiece = getPiecePiece(heldPieceCode)
+           heldPiece = getPieceInfo(heldPieceCode)
         
-        nextPiece = getPiecePiece(nextPieceCode)
+        nextPiece = getPieceInfo(nextPieceCode)
 
-        coords, color = getPiecePiece(currentPieceCode)
+        coords, color = getPieceInfo(currentPieceCode)
         if currentPieceCode == "I":
             topLeft = [-2, 3]
             
