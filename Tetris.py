@@ -14,21 +14,25 @@ class Tetris:
         self.COLOR = {
             "black" : [0, 0, 0],
             "white" : [255, 255, 255],
-            "blue" : [255, 41, 41],
-            "red" : [179, 179, 255],
-            "yellow" : [153, 238, 255],
-            "green" : [217, 217, 180],
-            "purple" : [255, 179, 219],
+            "blue" : [255, 148, 41],
+            "red" : [0, 0, 255],
+            "yellow" : [5, 209, 255],
+            "green" : [119, 202, 2],
+            "purple" : [255, 0, 136],
+            "pink" : [189, 122, 255],
         }
         self.BOARD = np.uint8(np.zeros([20, 10, 3]))
         self.COMMANDS = {
             "rotate" : [ord("w"), ord("W")],
+            "up" : [ord("w"), ord("W")],
             "hard drop" : [32],
+            "space" : [32],
             "left" : [ord("a"), ord("A")],
             "right" : [ord("d"), ord("D")],
             "down" : [ord("s"), ord("S")],
             "hold" : [ord("q"), ord("Q")],
-            "quit" : [27]
+            "quit" : [27],
+            "back" : [ord("b"), ord("B")],
         }
         self.ALL_PIECES = ["O", "I", "S", "Z", "L", "J", "T"]
 
@@ -67,65 +71,54 @@ class Tetris:
     def getPieceInfo(self, pieceCode):
         if pieceCode == "I":
             coords = np.array([[0, 3], [0, 4], [0, 5], [0, 6]])
-            color = [255, 155, 15]
+            color = self.COLOR["white"]
         elif pieceCode == "T":
             coords = np.array([[1, 3], [1, 4], [1, 5], [0, 4]])
-            color = [138, 41, 175]
+            color = self.COLOR["purple"]
         elif pieceCode == "L":
             coords = np.array([[1, 3], [1, 4], [1, 5], [0, 5]])
-            color = [2, 91, 227]
+            color = self.COLOR["pink"]
         elif pieceCode == "J":
             coords = np.array([[1, 3], [1, 4], [1, 5], [0, 3]])
-            color = [198, 65, 33]
+            color = self.COLOR["blue"]
         elif pieceCode == "S":
             coords = np.array([[1, 5], [1, 4], [0, 3], [0, 4]])
-            color = [55, 15, 215]
+            color = self.COLOR["green"]
         elif pieceCode == "Z":
             coords = np.array([[1, 3], [1, 4], [0, 4], [0, 5]])
-            color = [1, 177, 89]
+            color = self.COLOR["red"]
         else:
             coords = np.array([[0, 4], [0, 5], [1, 4], [1, 5]])
-            color = [2, 159, 227]
+            color = self.COLOR["yellow"]
 
         return coords, color
 
     def areMatched(self, key, command):
         return key in self.COMMANDS[command]
 
-    def chooseLevel(self):
-        levelPage = cv2.imread("level.png")
-        cv2.imshow(self.WINDOW_NAME, levelPage)
-        cv2.waitKey()
+    def changeOption(self):
+        optionPage = cv2.imread("option-level.png")
+        cv2.imshow(self.WINDOW_NAME, optionPage)
+        key = cv2.waitKey()
+        while(key != self.COMMANDS["back"]):
+            key = cv2.waitKey()
+        return "back"
 
     def showRank(self):
         rankPage = cv2.imread("rank-begin.png")
         cv2.imshow(self.WINDOW_NAME, rankPage)
-        cv2.waitKey()
+        key = cv2.waitKey()
+        while(key != self.COMMANDS["back"]):
+            key = cv2.waitKey()
+        return "back"
 
     def showRule(self):
         rulePage = cv2.imread("rule.png")
         cv2.imshow(self.WINDOW_NAME, rulePage)
-        cv2.waitKey()
-
-    def startGame(self):
-        homePage = np.zeros((440, 680, 3), np.uint8)
-        font = cv2.FONT_HERSHEY_DUPLEX
-        cv2.putText(homePage, "TETRIS", (self.CENTER_POINT_X-150, self.CENTER_POINT_Y-130), font, 3, self.COLOR["white"], 10)
-
-        homePage[self.CENTER_POINT_Y-100:self.CENTER_POINT_Y-40, self.CENTER_POINT_X-100:self.CENTER_POINT_X+100] = self.COLOR["red"]
-        cv2.putText(homePage, "START", (self.CENTER_POINT_X-70, self.CENTER_POINT_Y-55), font, 1.5, self.COLOR["black"], 2)
-
-        homePage[self.CENTER_POINT_Y-20:self.CENTER_POINT_Y+40, self.CENTER_POINT_X-100:self.CENTER_POINT_X+100] = self.COLOR["purple"]
-        cv2.putText(homePage, "LEVEL", (self.CENTER_POINT_X-68, self.CENTER_POINT_Y+25), font, 1.5, self.COLOR["black"], 2)
-
-        homePage[self.CENTER_POINT_Y+60:self.CENTER_POINT_Y+120, self.CENTER_POINT_X-100:self.CENTER_POINT_X+100] = self.COLOR["green"]
-        cv2.putText(homePage, "RANK", (self.CENTER_POINT_X-62, self.CENTER_POINT_Y+105), font, 1.5, self.COLOR["black"], 2)
-
-        homePage[self.CENTER_POINT_Y+140:self.CENTER_POINT_Y+200, self.CENTER_POINT_X-100:self.CENTER_POINT_X+100] = self.COLOR["yellow"]
-        cv2.putText(homePage, "RULES", (self.CENTER_POINT_X-70, self.CENTER_POINT_Y+185), font, 1.5, self.COLOR["black"], 2)
-
-        cv2.imshow(self.WINDOW_NAME, homePage)
-        cv2.waitKey()
+        key = cv2.waitKey()
+        while(key != self.COMMANDS["back"]):
+            key = cv2.waitKey()
+        return "back"
 
     def playGame(self):
         def display(coords, color, nextPiece, heldPiece):
@@ -319,12 +312,40 @@ class Tetris:
         for idx, r in enumerate(record):
             if r["time"] == timestamp:
                 print(f"Rank: {idx+1}")
+    
+    def startGame(self):
+        homePage = cv2.imread("home.png")
+        cv2.imshow(self.WINDOW_NAME, homePage)
+        key = cv2.waitKey()
+        click = 0
+        while(key):
+            if (key == self.COMMANDS["up"]):
+                click -= 1
+                print(click)
+            elif (key == self.COMMANDS["down"]):
+                click +=1
+                print(click)
+            elif (key == self.COMMANDS["space"]):
+                print("space")
+                value = "none"
+                if(click %4 == 1):
+                    value = self.changeOption()
+                    if(value == "back"):
+                         self.startGame()
+                elif(click %4 == 2):
+                    value =  self.showRank()
+                    if(value == "back"):
+                         self.startGame()
+                elif(click %4 == 3):
+                    value =  self.showRule()
+                    if(value == "back"):
+                         self.startGame()
+                elif(click %4 == 0):
+                     self.playGame()
+        key = cv2.waitKey()
 
     def play(self):
-        self.startGame()
-        self.showRule()
-        self.showRank()
-        self.chooseLevel()
+        # self.startGame()
         self.playGame()
         self.endGame()
 
