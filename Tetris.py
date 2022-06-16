@@ -416,7 +416,7 @@ class Tetris:
             key = cv2.waitKey()
 
     def play(self):
-        self.startGame()
+        # self.startGame()
         self.playGame()
         self.endGame()
 
