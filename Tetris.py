@@ -497,7 +497,7 @@ class Tetris:
             idx = 1
             records = rankingRecord[0:3]
         elif rank == len(rankingRecord):
-            idx = rank - 2
+            idx = max(rank - 2, 1)
             records = rankingRecord[-3:]
         else:
             idx = rank - 1
