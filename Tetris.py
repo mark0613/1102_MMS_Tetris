@@ -413,13 +413,9 @@ class Tetris:
                 return "quit"
 
     def play(self):
-<<<<<<< HEAD
         option = self.startGame()
         if option == "quit":
             return
-=======
-        # self.startGame()
->>>>>>> 3a67c66fbead02c3993ec34bfc08d0d994bc7d6e
         self.playGame()
         self.endGame()
 
