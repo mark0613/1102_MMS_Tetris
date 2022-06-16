@@ -44,7 +44,7 @@ class Tetris:
             "rule",
         ]
         self.TIME_OPTIONS = [
-            "leve",
+            "level",
             "mode"
         ]
         self.BOARD = np.uint8(np.zeros([20, 10, 3]))
@@ -136,31 +136,31 @@ class Tetris:
             if self.areMatched(key, "quit"):
                 return "quit"
 
-    def showTimeOptions(self):
-        optionTimePage = cv2.imread("option-time.png")
+    def showModeOptions(self):
+        optionModePage = cv2.imread("option-mode.png")
         pt = [np.array(self.ARROW[1])]
-        cv2.drawContours(optionTimePage, pt, 0, self.COLOR["red"], -1)
-        cv2.imshow(self.WINDOW_NAME, optionTimePage)
+        cv2.drawContours(optionModePage, pt, 0, self.COLOR["red"], -1)
+        cv2.imshow(self.WINDOW_NAME, optionModePage)
         key = cv2.waitKey()
-        click = 0
-        while(key):
-            if(key == 32):
-                return "home"
-            elif (key == ord('b')):
-                return "back"
-            elif (key == ord('w') or key == ord('s')):
-                if (key == ord('w')):
-                    click -= 1
-                elif (key == ord('s')):
-                    click += 1
-                if (click%2 == 0):
-                    pt = [np.array(self.ARROW[1])]
-                elif (click%2 == 1):
-                    pt = [np.array(self.ARROW[2])]
-                optionTimePage[90:380, 170:220] = [0, 0, 0]
-                cv2.drawContours(optionTimePage, pt, 0, self.COLOR["red"], -1)
-                cv2.imshow(self.WINDOW_NAME, optionTimePage)
-            key = cv2.waitKey()
+        optionValue = 0
+        while True:
+            if self.areMatched(key, "up") or self.areMatched(key, "down"):
+                if self.areMatched(key, "up"):
+                    optionValue -= 1
+                elif self.areMatched(key, "down"):
+                    optionValue += 1
+
+                pt = [np.array(self.ARROW[optionValue%2+1])]
+                optionModePage[90:380, 170:220] = [0, 0, 0]
+                cv2.drawContours(optionModePage, pt, 0, self.COLOR["red"], -1)
+                cv2.imshow(self.WINDOW_NAME, optionModePage)
+                key = cv2.waitKey()
+
+            if self.areMatched(key, "confirm"):
+                return self.MENU_OPTIONS[2]
+
+            if self.areMatched(key, "quit"):
+                return "quit"
 
     def showLevelOptions(self):
         optionLevelPage = cv2.imread("option-level.png")
@@ -168,27 +168,52 @@ class Tetris:
         cv2.drawContours(optionLevelPage, pt, 0, self.COLOR["red"], -1)
         cv2.imshow(self.WINDOW_NAME, optionLevelPage)
         key = cv2.waitKey()
-        click = 0
-        while(key != ord('b')):
-            if (key == ord('w') or key == ord('s')):
-                if (key== ord('w')):
-                    click -= 1
-                elif (key== ord('s')):
-                    click += 1
+        optionValue = 0
+        while True:
+            if self.areMatched(key, "up") or self.areMatched(key, "down"):
+                if self.areMatched(key, "up"):
+                    optionValue -= 1
+                elif self.areMatched(key, "down"):
+                    optionValue += 1
 
-                pt = [np.array(self.ARROW[click%4])]
+                pt = [np.array(self.ARROW[optionValue%4])]
                 optionLevelPage[90:380, 170:220] = [0, 0, 0]
                 cv2.drawContours(optionLevelPage, pt, 0, self.COLOR["red"], -1)
                 cv2.imshow(self.WINDOW_NAME, optionLevelPage)
-            elif(key == 32):
-                value = self.showTimeOptions()
-                if(value == "home"):
-                    break
-                elif(value == "back"):
-                    self.showTimeOptions() 
-            key = cv2.waitKey()
-        return "home"
+                key = cv2.waitKey()
 
+            if self.areMatched(key, "confirm"):
+                return self.MENU_OPTIONS[2]
+
+            if self.areMatched(key, "quit"):
+                return "quit"
+
+    def showOption(self):
+        optionPage = cv2.imread("option.png")
+        pt = [np.array(self.ARROW[1])]
+        cv2.drawContours(optionPage, pt, 0, self.COLOR["red"], -1)
+        cv2.imshow(self.WINDOW_NAME, optionPage)
+        key = cv2.waitKey()
+        optionValue = 0
+        while True:
+            if self.areMatched(key, "up") or self.areMatched(key, "down"):
+                if self.areMatched(key, "up"):
+                    optionValue -= 1
+                elif self.areMatched(key, "down"):
+                    optionValue += 1
+
+                pt = [np.array(self.ARROW[optionValue%2+1])]
+                optionPage[90:380, 170:220] = [0, 0, 0]
+                cv2.drawContours(optionPage, pt, 0, self.COLOR["red"], -1)
+                cv2.imshow(self.WINDOW_NAME, optionPage)
+                key = cv2.waitKey()
+
+            if self.areMatched(key, "confirm"):
+                return self.TIME_OPTIONS[optionValue]
+
+            if self.areMatched(key, "quit"):
+                return "quit"
+    
     def showRank(self):
         rankPage = cv2.imread("rank-begin.png")
         cv2.imshow(self.WINDOW_NAME, rankPage)
@@ -404,7 +429,11 @@ class Tetris:
             if option == "start":
                 return "play"
             elif option == "options":
-                pass
+                option = self.showOption()
+                if(option == "level"):
+                    self.showLevelOptions()
+                elif(option == "mode"):
+                    self.showModeOptions()
             elif option == "ranking":
                 self.showRank()
             elif option == "rule":
