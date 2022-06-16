@@ -9,12 +9,12 @@ class Tetris:
     def __init__(self):
         self.WINDOW_NAME = "Tetris"
         self.RATIO = 20
-        self.ARROW = {
-            "pt0" : [(170,90), (170,140), (220,115)],
-            "pt1" : [(170,170), (170,220), (220,195)],
-            "pt2" : [(170,250), (170,300), (220,275)],
-            "pt3" : [(170,330), (170,380), (220,355)],
-        }
+        self.ARROW = [
+            [(170,90), (170,140), (220,115)],
+            [(170,170), (170,220), (220,195)],
+            [(170,250), (170,300), (220,275)],
+            [(170,330), (170,380), (220,355)],
+        ]
         self.COLOR = {
             "black" : [0, 0, 0],
             "white" : [255, 255, 255],
@@ -25,12 +25,11 @@ class Tetris:
             "purple" : [255, 0, 136],
             "pink" : [189, 122, 255],
         }
-        self.BOARD = np.uint8(np.zeros([20, 10, 3]))
         self.COMMANDS = {
             "rotate" : [ord("w"), ord("W")],
             "up" : [ord("w"), ord("W")],
             "hard drop" : [32],
-            "space" : [32],
+            "confirm" : [32],
             "left" : [ord("a"), ord("A")],
             "right" : [ord("d"), ord("D")],
             "down" : [ord("s"), ord("S")],
@@ -38,6 +37,17 @@ class Tetris:
             "quit" : [27],
             "back" : [ord("b"), ord("B")],
         }
+        self.MENU_OPTIONS = [
+            "start",
+            "options",
+            "ranking",
+            "rule",
+        ]
+        self.TIME_OPTIONS = [
+            "leve",
+            "mode"
+        ]
+        self.BOARD = np.uint8(np.zeros([20, 10, 3]))
         self.ALL_PIECES = ["O", "I", "S", "Z", "L", "J", "T"]
 
         self.loadConfiguration()
@@ -100,9 +110,35 @@ class Tetris:
     def areMatched(self, key, command):
         return key in self.COMMANDS[command]
 
-    def changeOptionTime(self):
+    def showMenu(self):
+        homePage = cv2.imread("home.png")
+        pt = [np.array(self.ARROW[0])]
+        cv2.drawContours(homePage, pt, 0, self.COLOR["red"], -1)
+        cv2.imshow(self.WINDOW_NAME, homePage)
+        key = cv2.waitKey()
+        optionValue = 0
+        while True:
+            if self.areMatched(key, "up") or self.areMatched(key, "down"):
+                if self.areMatched(key, "up"):
+                    optionValue -= 1
+                elif self.areMatched(key, "down"):
+                    optionValue += 1
+
+                pt = [np.array(self.ARROW[optionValue%4])]
+                homePage[90:380, 170:220] = [0, 0, 0]
+                cv2.drawContours(homePage, pt, 0, self.COLOR["red"], -1)
+                cv2.imshow(self.WINDOW_NAME, homePage)
+                key = cv2.waitKey()
+
+            if self.areMatched(key, "confirm"):
+                return self.MENU_OPTIONS[optionValue]
+
+            if self.areMatched(key, "quit"):
+                return "quit"
+
+    def showTimeOptions(self):
         optionTimePage = cv2.imread("option-time.png")
-        pt = [np.array(self.ARROW["pt1"])]
+        pt = [np.array(self.ARROW[1])]
         cv2.drawContours(optionTimePage, pt, 0, self.COLOR["red"], -1)
         cv2.imshow(self.WINDOW_NAME, optionTimePage)
         key = cv2.waitKey()
@@ -118,17 +154,17 @@ class Tetris:
                 elif (key == ord('s')):
                     click += 1
                 if (click%2 == 0):
-                    pt = [np.array(self.ARROW["pt1"])]
+                    pt = [np.array(self.ARROW[1])]
                 elif (click%2 == 1):
-                    pt = [np.array(self.ARROW["pt2"])]
+                    pt = [np.array(self.ARROW[2])]
                 optionTimePage[90:380, 170:220] = [0, 0, 0]
                 cv2.drawContours(optionTimePage, pt, 0, self.COLOR["red"], -1)
                 cv2.imshow(self.WINDOW_NAME, optionTimePage)
             key = cv2.waitKey()
 
-    def changeOptionLevel(self):
+    def showLevelOptions(self):
         optionLevelPage = cv2.imread("option-level.png")
-        pt = [np.array(self.ARROW["pt0"])]
+        pt = [np.array(self.ARROW[0])]
         cv2.drawContours(optionLevelPage, pt, 0, self.COLOR["red"], -1)
         cv2.imshow(self.WINDOW_NAME, optionLevelPage)
         key = cv2.waitKey()
@@ -140,41 +176,34 @@ class Tetris:
                 elif (key== ord('s')):
                     click += 1
 
-                if (click%4 == 0):
-                    pt = [np.array(self.ARROW["pt0"])]
-                elif (click%4 == 1):
-                    pt = [np.array(self.ARROW["pt1"])]
-                elif (click%4 == 2):
-                    pt = [np.array(self.ARROW["pt2"])]
-                elif (click%4 == 3):
-                    pt = [np.array(self.ARROW["pt3"])]
+                pt = [np.array(self.ARROW[click%4])]
                 optionLevelPage[90:380, 170:220] = [0, 0, 0]
                 cv2.drawContours(optionLevelPage, pt, 0, self.COLOR["red"], -1)
                 cv2.imshow(self.WINDOW_NAME, optionLevelPage)
             elif(key == 32):
-                value = self.changeOptionTime()
+                value = self.showTimeOptions()
                 if(value == "home"):
                     break
                 elif(value == "back"):
-                    self.changeOptionLevel()  
+                    self.showTimeOptions() 
             key = cv2.waitKey()
         return "home"
 
     def showRank(self):
         rankPage = cv2.imread("rank-begin.png")
         cv2.imshow(self.WINDOW_NAME, rankPage)
-        key = cv2.waitKey()
-        while(key != self.COMMANDS["back"]):
+        while True:
             key = cv2.waitKey()
-        return "back"
+            if self.areMatched(key, "back"):
+                return
 
     def showRule(self):
         rulePage = cv2.imread("rule.png")
         cv2.imshow(self.WINDOW_NAME, rulePage)
-        key = cv2.waitKey()
-        while(key != self.COMMANDS["back"]):
+        while True:
             key = cv2.waitKey()
-        return "back"
+            if self.areMatched(key, "back"):
+                return
 
     def playGame(self):
         def display(coords, color, nextPiece, heldPiece):
@@ -370,53 +399,23 @@ class Tetris:
                 print(f"Rank: {idx+1}")
     
     def startGame(self):
-        homePage = cv2.imread("home.png")
-        pt = [np.array(self.ARROW["pt0"])]
-        cv2.drawContours(homePage, pt, 0, self.COLOR["red"], -1)
-        cv2.imshow(self.WINDOW_NAME, homePage)
-        key = cv2.waitKey()
-        click = 0
-
-        while(key):
-            if (key == ord('w') or key == ord('s')):
-                if (key == ord('w')):
-                    click -= 1
-                elif (key == ord('s')):
-                    click += 1
-
-                if (click%4 == 0):
-                    pt = [np.array(self.ARROW["pt0"])]
-                elif (click%4 == 1):
-                    pt = [np.array(self.ARROW["pt1"])]
-                elif (click%4 == 2):
-                    pt = [np.array(self.ARROW["pt2"])]
-                elif (click%4 == 3):
-                    pt = [np.array(self.ARROW["pt3"])]
-                homePage[90:380, 170:220] = [0, 0, 0]
-                cv2.drawContours(homePage, pt, 0, self.COLOR["red"], -1)
-                cv2.imshow(self.WINDOW_NAME, homePage) 
-            elif (key == 32):
-                value = "none"
-                if(click %4 == 1):
-                    value = self.changeOptionLevel()
-                    if(value == "home"):
-                        self.startGame()
-                elif(click %4 == 2):
-                    value = self.showRank()
-                    if(value == "home"):
-                        self.startGame()
-                elif(click %4 == 3):
-                    value = self.showRule()
-                    if(value == "home"):
-                        self.startGame()
-                elif(click %4 == 0):
-                    self.playGame()
-            elif(key == 27):
-                cv2.destroyAllWindows()
-            key = cv2.waitKey()
+        while True:
+            option = self.showMenu()
+            if option == "start":
+                return "play"
+            elif option == "options":
+                pass
+            elif option == "ranking":
+                self.showRank()
+            elif option == "rule":
+                self.showRule()
+            else:
+                return "quit"
 
     def play(self):
-        self.startGame()
+        option = self.startGame()
+        if option == "quit":
+            return
         self.playGame()
         self.endGame()
 
