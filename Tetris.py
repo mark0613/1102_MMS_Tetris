@@ -264,7 +264,7 @@ class Tetris:
             if option == "start":
                 return "play"
             elif option == "options":
-                pass
+                self.showOption()
             elif option == "ranking":
                 self.showRankingRecord()
             elif option == "rule":
@@ -487,23 +487,10 @@ class Tetris:
         cv2.imshow(self.WINDOW_NAME, rankingPage)
 
         while True:
-<<<<<<< HEAD
-            option = self.showMenu()
-            if option == "start":
-                return "play"
-            elif option == "options":
-                self.showOption()
-            elif option == "ranking":
-                self.showRankingRecord()
-            elif option == "rule":
-                self.showRule()
-            else:
-=======
             key = cv2.waitKey()
             if self.areMatched(key, "back"):
                 return "play again"
             if self.areMatched(key, "quit"):
->>>>>>> 6b6b9954ddae1e483403b4a69c4393b3763920e0
                 return "quit"
 
     def play(self):
