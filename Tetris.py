@@ -300,19 +300,23 @@ class Tetris:
             dummy[coords[:,0], coords[:,1]] = color
 
             right = np.uint8(np.zeros([20, 10, 3]))
-            right[nextPiece[0][:,0] + 2, nextPiece[0][:,1]] = nextPiece[1]
+            right[nextPiece[0][:,0] + 4, nextPiece[0][:,1]] = nextPiece[1]
             left = np.uint8(np.zeros([20, 10, 3]))
-            left[heldPiece[0][:,0] + 2, heldPiece[0][:,1]] = heldPiece[1]
+            left[heldPiece[0][:,0] + 4, heldPiece[0][:,1]] = heldPiece[1]
 
             dummy = np.concatenate((self.border, left, self.border, dummy, self.border, right, self.border), 1)
             dummy = np.concatenate((self.border_, dummy, self.border_), 0)
             dummy = dummy.repeat(self.RATIO, 0).repeat(self.RATIO, 1)
-            dummy = cv2.putText(dummy, str(self.score), (520, 200), cv2.FONT_HERSHEY_DUPLEX, 1, [0, 0, 255], 2)
+            dummy = cv2.putText(dummy, "SCORE", (510, 210), cv2.FONT_HERSHEY_DUPLEX, 1, self.COLOR["white"], 2)
+            dummy = cv2.putText(dummy, str(self.score), (540, 260), cv2.FONT_HERSHEY_DUPLEX, 1, [0, 0, 255], 2)
 
             # side
-            timerText = "oo" if self.isZen else timer-1
-            dummy = cv2.putText(dummy, f"time: {timerText}", (45, 200), cv2.FONT_HERSHEY_DUPLEX, 0.6, self.COLOR["white"])
+            timerText = "--" if self.isZen else timer-1
+            dummy = cv2.putText(dummy, "TIME", (520, 330), cv2.FONT_HERSHEY_DUPLEX, 1, self.COLOR["white"], 2)
+            dummy = cv2.putText(dummy, f"{timerText}", (530, 370), cv2.FONT_HERSHEY_DUPLEX, 1, self.COLOR["blue-light"], 2)
 
+            dummy = cv2.putText(dummy, "HOLD", (80, 80), cv2.FONT_HERSHEY_DUPLEX, 1, self.COLOR["white"], 2)
+            dummy = cv2.putText(dummy, "NEXT", (520, 80), cv2.FONT_HERSHEY_DUPLEX, 1, self.COLOR["white"], 2)
             cv2.imshow(self.WINDOW_NAME, dummy)
             return cv2.waitKey(int(1000/self.speed))
 
@@ -501,7 +505,7 @@ class Tetris:
         for record in records:
             color = self.COLOR["red"] if idx==rank else self.COLOR["white"]
             cv2.putText(rankingPage, f"{idx}", (320, coords_y), cv2.FONT_HERSHEY_SCRIPT_COMPLEX, 1.5, color)
-            cv2.putText(rankingPage, f":", (370, coords_y), cv2.FONT_HERSHEY_TRIPLEX, 1.5, color)
+            cv2.putText(rankingPage, f":", (390, coords_y), cv2.FONT_HERSHEY_TRIPLEX, 1.5, color)
             cv2.putText(rankingPage, f"{record['score']}", (410, coords_y), cv2.FONT_HERSHEY_DUPLEX, 1.5, color)
             coords_y += 80
             idx += 1
