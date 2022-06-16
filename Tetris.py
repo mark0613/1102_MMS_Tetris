@@ -258,6 +258,20 @@ class Tetris:
             if self.areMatched(key, "back"):
                 return
 
+    def startGame(self):
+        while True:
+            option = self.showMenu()
+            if option == "start":
+                return "play"
+            elif option == "options":
+                pass
+            elif option == "ranking":
+                self.showRankingRecord()
+            elif option == "rule":
+                self.showRule()
+            else:
+                return "quit"
+
     def playGame(self):
         def display(coords, color, nextPiece, heldPiece):
             # game
@@ -439,20 +453,41 @@ class Tetris:
 
     def endGame(self):
         timestamp = time.strftime("%Y/%m/%d, %H:%M:%S", time.localtime())
-        record = self.loadRecord()
+        rankingRecord = self.loadRecord()
         newRecord = {
             "time" : timestamp,
             "score" : self.score,
         }
-        record.append(newRecord)
-        record.sort(key=lambda r: r["score"], reverse=True)
-        self.saveRecord(record)
-        for idx, r in enumerate(record):
-            if r["time"] == timestamp:
-                print(f"Rank: {idx+1}")
-    
-    def startGame(self):
+        rankingRecord.append(newRecord)
+        rankingRecord.sort(key=lambda r: r["score"], reverse=True)
+        self.saveRecord(rankingRecord)
+        for idx, record in enumerate(rankingRecord):
+            if record["time"] == timestamp:
+                rank = idx+1
+        
+        if rank == 1:
+            idx = 1
+            records = rankingRecord[0:3]
+        elif rank == len(rankingRecord):
+            idx = rank - 2
+            records = rankingRecord[-3:]
+        else:
+            idx = rank - 1
+            records = rankingRecord[rank-1:rank+2]
+
+        rankingPage = cv2.imread("rank-end.png")
+        coords_y = 170
+        for record in records:
+            color = self.COLOR["red"] if idx==rank else self.COLOR["white"]
+            cv2.putText(rankingPage, f"{idx}", (320, coords_y), cv2.FONT_HERSHEY_SCRIPT_COMPLEX, 1.5, color)
+            cv2.putText(rankingPage, f":", (370, coords_y), cv2.FONT_HERSHEY_TRIPLEX, 1.5, color)
+            cv2.putText(rankingPage, f"{record['score']}", (410, coords_y), cv2.FONT_HERSHEY_DUPLEX, 1.5, color)
+            coords_y += 80
+            idx += 1
+        cv2.imshow(self.WINDOW_NAME, rankingPage)
+
         while True:
+<<<<<<< HEAD
             option = self.showMenu()
             if option == "start":
                 return "play"
@@ -463,6 +498,12 @@ class Tetris:
             elif option == "rule":
                 self.showRule()
             else:
+=======
+            key = cv2.waitKey()
+            if self.areMatched(key, "back"):
+                return "play again"
+            if self.areMatched(key, "quit"):
+>>>>>>> 6b6b9954ddae1e483403b4a69c4393b3763920e0
                 return "quit"
 
     def play(self):
