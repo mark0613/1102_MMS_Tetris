@@ -4,6 +4,7 @@ import cv2
 import numpy as np
 import random
 import time
+import math
 
 class Tetris:
     def __init__(self):
@@ -19,6 +20,7 @@ class Tetris:
             "black" : [0, 0, 0],
             "white" : [255, 255, 255],
             "blue" : [255, 148, 41],
+            "blue-light" : [255, 190, 183],
             "red" : [0, 0, 255],
             "yellow" : [5, 209, 255],
             "green" : [119, 202, 2],
@@ -189,13 +191,31 @@ class Tetris:
             key = cv2.waitKey()
         return "home"
 
-    def showRank(self):
-        rankPage = cv2.imread("rank-begin.png")
-        cv2.imshow(self.WINDOW_NAME, rankPage)
+    def showRankingRecord(self):
+        rankinRecord = self.loadRecord()
+        page = 1
+        perPage = 10
         while True:
+            rankingPage = cv2.imread("rank-begin.png")
+            record = rankinRecord[(page-1)*perPage : (page-1)*perPage+perPage]
+            coords_y = 110
+
+            for idx, r in enumerate(record):
+                cv2.putText(rankingPage, f"{idx + (page-1)*perPage + 1}", (180, coords_y), cv2.FONT_HERSHEY_TRIPLEX, 0.7, self.COLOR["white"])
+                cv2.putText(rankingPage, f":", (220, coords_y), cv2.FONT_HERSHEY_TRIPLEX, 0.7, self.COLOR["white"])
+                cv2.putText(rankingPage, f"{r['score']}", (240, coords_y), cv2.FONT_HERSHEY_TRIPLEX, 0.7, self.COLOR["red"])
+                cv2.putText(rankingPage, f"{r['time']}", (320, coords_y-2), cv2.FONT_HERSHEY_SIMPLEX, 0.5, self.COLOR["blue-light"])
+                coords_y += 30
+
+            cv2.imshow(self.WINDOW_NAME, rankingPage)
             key = cv2.waitKey()
             if self.areMatched(key, "back"):
                 return
+            if self.areMatched(key, "left"):
+                page = max(page-1, 1)
+            if self.areMatched(key, "right"):
+                page = min(page+1, math.ceil(len(rankinRecord)/perPage))
+
 
     def showRule(self):
         rulePage = cv2.imread("rule.png")
@@ -406,7 +426,7 @@ class Tetris:
             elif option == "options":
                 pass
             elif option == "ranking":
-                self.showRank()
+                self.showRankingRecord()
             elif option == "rule":
                 self.showRule()
             else:
