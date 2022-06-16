@@ -159,8 +159,7 @@ class Tetris:
                 key = cv2.waitKey()
 
             if self.areMatched(key, "confirm"):
-                return self.MENU_OPTIONS[2]
-
+                return
             if self.areMatched(key, "quit"):
                 return "quit"
 
@@ -185,12 +184,11 @@ class Tetris:
                 key = cv2.waitKey()
 
             if self.areMatched(key, "confirm"):
-                return self.MENU_OPTIONS[2]
-
+                return
             if self.areMatched(key, "quit"):
                 return "quit"
 
-    def showOption(self):
+    def showOption(self):    
         optionPage = cv2.imread("option.png")
         pt = [np.array(self.ARROW[1])]
         cv2.drawContours(optionPage, pt, 0, self.COLOR["red"], -1)
@@ -211,8 +209,10 @@ class Tetris:
                 key = cv2.waitKey()
 
             if self.areMatched(key, "confirm"):
-                return self.TIME_OPTIONS[optionValue]
-
+                if self.TIME_OPTIONS[optionValue] == "level":
+                    self.showLevelOptions()
+                elif self.TIME_OPTIONS[optionValue] == "mode":
+                    self.showModeOptions()
             if self.areMatched(key, "quit"):
                 return "quit"
 
@@ -457,11 +457,7 @@ class Tetris:
             if option == "start":
                 return "play"
             elif option == "options":
-                option = self.showOption()
-                if(option == "level"):
-                    self.showLevelOptions()
-                elif(option == "mode"):
-                    self.showModeOptions()
+                self.showOption()
             elif option == "ranking":
                 self.showRankingRecord()
             elif option == "rule":
