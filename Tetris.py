@@ -138,11 +138,11 @@ class Tetris:
             if self.areMatched(key, "quit"):
                 return "quit"
 
-    def showModeOptions(self):
-        optionModePage = cv2.imread("option-mode.png")
+    def showOption(self):    
+        optionPage = cv2.imread("option.png")
         pt = [np.array(self.ARROW[1])]
-        cv2.drawContours(optionModePage, pt, 0, self.COLOR["red"], -1)
-        cv2.imshow(self.WINDOW_NAME, optionModePage)
+        cv2.drawContours(optionPage, pt, 0, self.COLOR["red"], -1)
+        cv2.imshow(self.WINDOW_NAME, optionPage)
         key = cv2.waitKey()
         optionValue = 0
         while True:
@@ -151,17 +151,26 @@ class Tetris:
                     optionValue -= 1
                 elif self.areMatched(key, "down"):
                     optionValue += 1
+                optionValue %= 2
 
-                pt = [np.array(self.ARROW[optionValue%2+1])]
-                optionModePage[90:380, 170:220] = [0, 0, 0]
-                cv2.drawContours(optionModePage, pt, 0, self.COLOR["red"], -1)
-                cv2.imshow(self.WINDOW_NAME, optionModePage)
-                key = cv2.waitKey()
+                pt = [np.array(self.ARROW[optionValue+1])]
+                optionPage[90:380, 170:220] = [0, 0, 0]
+                cv2.drawContours(optionPage, pt, 0, self.COLOR["red"], -1)
+                cv2.imshow(self.WINDOW_NAME, optionPage)
 
             if self.areMatched(key, "confirm"):
+                if self.TIME_OPTIONS[optionValue] == "level":
+                    self.showLevelOptions()
+                elif self.TIME_OPTIONS[optionValue] == "mode":
+                    self.showModeOptions()
+            if self.areMatched(key, "back"):
                 return
             if self.areMatched(key, "quit"):
                 return "quit"
+
+            cv2.imshow(self.WINDOW_NAME, optionPage)
+            key = cv2.waitKey()
+
 
     def showLevelOptions(self):
         optionLevelPage = cv2.imread("option-level.png")
@@ -176,8 +185,9 @@ class Tetris:
                     optionValue -= 1
                 elif self.areMatched(key, "down"):
                     optionValue += 1
+                optionValue %= 4
 
-                pt = [np.array(self.ARROW[optionValue%4])]
+                pt = [np.array(self.ARROW[optionValue])]
                 optionLevelPage[90:380, 170:220] = [0, 0, 0]
                 cv2.drawContours(optionLevelPage, pt, 0, self.COLOR["red"], -1)
                 cv2.imshow(self.WINDOW_NAME, optionLevelPage)
@@ -185,14 +195,16 @@ class Tetris:
 
             if self.areMatched(key, "confirm"):
                 return
+            if self.areMatched(key, "back"):
+                return
             if self.areMatched(key, "quit"):
                 return "quit"
 
-    def showOption(self):    
-        optionPage = cv2.imread("option.png")
+    def showModeOptions(self):
+        optionModePage = cv2.imread("option-mode.png")
         pt = [np.array(self.ARROW[1])]
-        cv2.drawContours(optionPage, pt, 0, self.COLOR["red"], -1)
-        cv2.imshow(self.WINDOW_NAME, optionPage)
+        cv2.drawContours(optionModePage, pt, 0, self.COLOR["red"], -1)
+        cv2.imshow(self.WINDOW_NAME, optionModePage)
         key = cv2.waitKey()
         optionValue = 0
         while True:
@@ -201,18 +213,18 @@ class Tetris:
                     optionValue -= 1
                 elif self.areMatched(key, "down"):
                     optionValue += 1
+                optionValue %= 2
 
-                pt = [np.array(self.ARROW[optionValue%2+1])]
-                optionPage[90:380, 170:220] = [0, 0, 0]
-                cv2.drawContours(optionPage, pt, 0, self.COLOR["red"], -1)
-                cv2.imshow(self.WINDOW_NAME, optionPage)
+                pt = [np.array(self.ARROW[optionValue+1])]
+                optionModePage[90:380, 170:220] = [0, 0, 0]
+                cv2.drawContours(optionModePage, pt, 0, self.COLOR["red"], -1)
+                cv2.imshow(self.WINDOW_NAME, optionModePage)
                 key = cv2.waitKey()
 
             if self.areMatched(key, "confirm"):
-                if self.TIME_OPTIONS[optionValue] == "level":
-                    self.showLevelOptions()
-                elif self.TIME_OPTIONS[optionValue] == "mode":
-                    self.showModeOptions()
+                return
+            if self.areMatched(key, "back"):
+                return
             if self.areMatched(key, "quit"):
                 return "quit"
 
