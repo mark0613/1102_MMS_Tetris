@@ -9,8 +9,12 @@ class Tetris:
     def __init__(self):
         self.WINDOW_NAME = "Tetris"
         self.RATIO = 20
-        self.CENTER_POINT_X = 340
-        self.CENTER_POINT_Y = 220
+        self.ARROW = {
+            "pt0" : [(170,90), (170,140), (220,115)],
+            "pt1" : [(170,170), (170,220), (220,195)],
+            "pt2" : [(170,250), (170,300), (220,275)],
+            "pt3" : [(170,330), (170,380), (220,355)],
+        }
         self.COLOR = {
             "black" : [0, 0, 0],
             "white" : [255, 255, 255],
@@ -96,13 +100,65 @@ class Tetris:
     def areMatched(self, key, command):
         return key in self.COMMANDS[command]
 
-    def changeOption(self):
-        optionPage = cv2.imread("option-level.png")
-        cv2.imshow(self.WINDOW_NAME, optionPage)
+    def changeOptionTime(self):
+        optionTimePage = cv2.imread("option-time.png")
+        pt = [np.array(self.ARROW["pt1"])]
+        cv2.drawContours(optionTimePage, pt, 0, self.COLOR["red"], -1)
+        cv2.imshow(self.WINDOW_NAME, optionTimePage)
         key = cv2.waitKey()
-        while(key != self.COMMANDS["back"]):
+        click = 0
+        while(key):
+            if(key == 32):
+                return "home"
+            elif (key == ord('b')):
+                return "back"
+            elif (key == ord('w') or key == ord('s')):
+                if (key == ord('w')):
+                    click -= 1
+                elif (key == ord('s')):
+                    click += 1
+                if (click%2 == 0):
+                    pt = [np.array(self.ARROW["pt1"])]
+                elif (click%2 == 1):
+                    pt = [np.array(self.ARROW["pt2"])]
+                optionTimePage[90:380, 170:220] = [0, 0, 0]
+                cv2.drawContours(optionTimePage, pt, 0, self.COLOR["red"], -1)
+                cv2.imshow(self.WINDOW_NAME, optionTimePage)
             key = cv2.waitKey()
-        return "back"
+
+    def changeOptionLevel(self):
+        optionLevelPage = cv2.imread("option-level.png")
+        pt = [np.array(self.ARROW["pt0"])]
+        cv2.drawContours(optionLevelPage, pt, 0, self.COLOR["red"], -1)
+        cv2.imshow(self.WINDOW_NAME, optionLevelPage)
+        key = cv2.waitKey()
+        click = 0
+        while(key != ord('b')):
+            if (key == ord('w') or key == ord('s')):
+                if (key== ord('w')):
+                    click -= 1
+                elif (key== ord('s')):
+                    click += 1
+
+                if (click%4 == 0):
+                    pt = [np.array(self.ARROW["pt0"])]
+                elif (click%4 == 1):
+                    pt = [np.array(self.ARROW["pt1"])]
+                elif (click%4 == 2):
+                    pt = [np.array(self.ARROW["pt2"])]
+                elif (click%4 == 3):
+                    pt = [np.array(self.ARROW["pt3"])]
+                optionLevelPage[90:380, 170:220] = [0, 0, 0]
+                cv2.drawContours(optionLevelPage, pt, 0, self.COLOR["red"], -1)
+                cv2.imshow(self.WINDOW_NAME, optionLevelPage)
+            elif(key == 32):
+                value = self.changeOptionTime()
+                if(value == "home"):
+                    break
+                elif(value == "back"):
+                    self.changeOptionLevel()  
+            key = cv2.waitKey()
+        return "home"
 
     def showRank(self):
         rankPage = cv2.imread("rank-begin.png")
@@ -315,37 +371,52 @@ class Tetris:
     
     def startGame(self):
         homePage = cv2.imread("home.png")
+        pt = [np.array(self.ARROW["pt0"])]
+        cv2.drawContours(homePage, pt, 0, self.COLOR["red"], -1)
         cv2.imshow(self.WINDOW_NAME, homePage)
         key = cv2.waitKey()
         click = 0
+
         while(key):
-            if (key == self.COMMANDS["up"]):
-                click -= 1
-                print(click)
-            elif (key == self.COMMANDS["down"]):
-                click +=1
-                print(click)
-            elif (key == self.COMMANDS["space"]):
-                print("space")
+            if (key == ord('w') or key == ord('s')):
+                if (key == ord('w')):
+                    click -= 1
+                elif (key == ord('s')):
+                    click += 1
+
+                if (click%4 == 0):
+                    pt = [np.array(self.ARROW["pt0"])]
+                elif (click%4 == 1):
+                    pt = [np.array(self.ARROW["pt1"])]
+                elif (click%4 == 2):
+                    pt = [np.array(self.ARROW["pt2"])]
+                elif (click%4 == 3):
+                    pt = [np.array(self.ARROW["pt3"])]
+                homePage[90:380, 170:220] = [0, 0, 0]
+                cv2.drawContours(homePage, pt, 0, self.COLOR["red"], -1)
+                cv2.imshow(self.WINDOW_NAME, homePage) 
+            elif (key == 32):
                 value = "none"
                 if(click %4 == 1):
-                    value = self.changeOption()
-                    if(value == "back"):
-                         self.startGame()
+                    value = self.changeOptionLevel()
+                    if(value == "home"):
+                        self.startGame()
                 elif(click %4 == 2):
-                    value =  self.showRank()
-                    if(value == "back"):
-                         self.startGame()
+                    value = self.showRank()
+                    if(value == "home"):
+                        self.startGame()
                 elif(click %4 == 3):
-                    value =  self.showRule()
-                    if(value == "back"):
-                         self.startGame()
+                    value = self.showRule()
+                    if(value == "home"):
+                        self.startGame()
                 elif(click %4 == 0):
-                     self.playGame()
-        key = cv2.waitKey()
+                    self.playGame()
+            elif(key == 27):
+                cv2.destroyAllWindows()
+            key = cv2.waitKey()
 
     def play(self):
-        # self.startGame()
+        self.startGame()
         self.playGame()
         self.endGame()
 
