@@ -21,9 +21,9 @@ class Tetris:
             "white" : [255, 255, 255],
             "blue" : [255, 148, 41],
             "blue-light" : [255, 190, 183],
+            "blue-dark" : [185, 116, 116],
             "red" : [0, 0, 255],
             "yellow" : [5, 209, 255],
-            "yellow-light" : [153, 238, 255],
             "green" : [119, 202, 2],
             "purple" : [255, 0, 136],
             "pink" : [189, 122, 255],
@@ -57,8 +57,8 @@ class Tetris:
 
         self.border = np.zeros([20, 1, 3], dtype=np.uint8)
         self.border_ = np.zeros([1, 34, 3], dtype=np.uint8)
-        self.border[:,:] = self.COLOR["yellow-light"]
-        self.border_[:,:] = self.COLOR["yellow-light"]
+        self.border[:,:] = self.COLOR["blue-dark"]
+        self.border_[:,:] = self.COLOR["blue-dark"]
         self.score = 0
     
     def loadConfiguration(self):
