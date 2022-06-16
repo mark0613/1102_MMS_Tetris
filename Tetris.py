@@ -68,9 +68,10 @@ class Tetris:
         self.speed = config["speed"]
         self.isZen = config["isZen"]
         self.timer = 120
+        return config
     
-    def saveConfiguration(self, data):
-        pass
+    def saveConfiguration(self, config):
+        dumpJsonFile(config, "config.json")
     
     def loadRecord(self):
         record = []
@@ -174,11 +175,11 @@ class Tetris:
 
     def showLevelOptions(self):
         optionLevelPage = cv2.imread("option-level.png")
-        pt = [np.array(self.ARROW[0])]
+        optionValue = self.speed - 1
+        pt = [np.array(self.ARROW[optionValue])]
         cv2.drawContours(optionLevelPage, pt, 0, self.COLOR["red"], -1)
         cv2.imshow(self.WINDOW_NAME, optionLevelPage)
         key = cv2.waitKey()
-        optionValue = 0
         while True:
             if self.areMatched(key, "up") or self.areMatched(key, "down"):
                 if self.areMatched(key, "up"):
@@ -194,6 +195,10 @@ class Tetris:
                 key = cv2.waitKey()
 
             if self.areMatched(key, "confirm"):
+                config = self.loadConfiguration()
+                config["speed"] = optionValue + 1
+                self.saveConfiguration(config)
+                self.loadConfiguration()
                 return
             if self.areMatched(key, "back"):
                 return
@@ -202,11 +207,11 @@ class Tetris:
 
     def showModeOptions(self):
         optionModePage = cv2.imread("option-mode.png")
-        pt = [np.array(self.ARROW[1])]
+        optionValue = 0 if not self.isZen else 1
+        pt = [np.array(self.ARROW[optionValue + 1])]
         cv2.drawContours(optionModePage, pt, 0, self.COLOR["red"], -1)
         cv2.imshow(self.WINDOW_NAME, optionModePage)
         key = cv2.waitKey()
-        optionValue = 0
         while True:
             if self.areMatched(key, "up") or self.areMatched(key, "down"):
                 if self.areMatched(key, "up"):
@@ -215,13 +220,17 @@ class Tetris:
                     optionValue += 1
                 optionValue %= 2
 
-                pt = [np.array(self.ARROW[optionValue+1])]
+                pt = [np.array(self.ARROW[optionValue + 1])]
                 optionModePage[90:380, 170:220] = [0, 0, 0]
                 cv2.drawContours(optionModePage, pt, 0, self.COLOR["red"], -1)
                 cv2.imshow(self.WINDOW_NAME, optionModePage)
                 key = cv2.waitKey()
 
             if self.areMatched(key, "confirm"):
+                config = self.loadConfiguration()
+                config["isZen"] = False if optionValue==0 else True
+                self.saveConfiguration(config)
+                self.loadConfiguration()
                 return
             if self.areMatched(key, "back"):
                 return
