@@ -233,6 +233,20 @@ class Tetris:
             if self.areMatched(key, "back"):
                 return
 
+    def startGame(self):
+        while True:
+            option = self.showMenu()
+            if option == "start":
+                return "play"
+            elif option == "options":
+                pass
+            elif option == "ranking":
+                self.showRankingRecord()
+            elif option == "rule":
+                self.showRule()
+            else:
+                return "quit"
+
     def playGame(self):
         def display(coords, color, nextPiece, heldPiece):
             # game
@@ -452,20 +466,6 @@ class Tetris:
             if self.areMatched(key, "back"):
                 return "play again"
             if self.areMatched(key, "quit"):
-                return "quit"
-    
-    def startGame(self):
-        while True:
-            option = self.showMenu()
-            if option == "start":
-                return "play"
-            elif option == "options":
-                pass
-            elif option == "ranking":
-                self.showRankingRecord()
-            elif option == "rule":
-                self.showRule()
-            else:
                 return "quit"
 
     def play(self):
